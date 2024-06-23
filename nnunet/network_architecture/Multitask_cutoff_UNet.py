@@ -376,11 +376,7 @@ class Multitask_cutoff_UNet(SegmentationNetwork):
                                   self.norm_op, self.norm_op_kwargs, self.dropout_op, self.dropout_op_kwargs,
                                   self.nonlin, self.nonlin_kwargs, basic_block=basic_block)
             ))
-            #print(len(self.conv_blocks_localization))
-            #print("#################################")
-            #print("#################################")
-            #print("#################################")
-            #print("#################################")
+
             
             ## feature fusion
         self.fusion_convs.append(torch.nn.Sequential(
@@ -435,35 +431,24 @@ class Multitask_cutoff_UNet(SegmentationNetwork):
         ))
 
 
-        #print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
-        #print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
-        #print(self.conv_blocks_localization)
-        #print(self.conv_blocks_context)
 
     def forward(self, x):
         skips = []
         seg_outputs = []
 
-        #print("length of self.conv_blocks_context is:", len(self.conv_blocks_context))
-        #print(x.shape)
+
         for d in range(len(self.conv_blocks_context) - 1):
             #print(d)
             x = self.conv_blocks_context[d](x)
             #print(x.shape)
             skips.append(x)
-            if not self.convolutional_pooling:    # True, not run
-                #print("=====================")
+            if not self.convolutional_pooling:    
                 x = self.td[d](x)   # td: MaxPool3d[2,2,2](x)
-                #print("================================")
         x1 = x
         x = self.conv_blocks_context[-1](x)   #Bottomleck
         x0 = x
 
-        #print("tu is:", self.tu)
-        #print("length of tu is:", len(self.tu))
-        #print("###################")
-        #print(x.shape)
-        #print("##################")
+
 
         for u in range(len(self.tu)):
             x = self.tu[u](x)
@@ -481,9 +466,7 @@ class Multitask_cutoff_UNet(SegmentationNetwork):
         X_1 = torch.nn.functional.adaptive_avg_pool3d(x1,(1,1,1))
         X_2 = torch.nn.functional.adaptive_avg_pool3d(x2,(1,1,1))
         x_class = torch.cat((X_0,X_1,X_2), dim=1).view(-1, 960)
-        # import pdb
-        # pdb.set_trace()
-        seg_class = self.fc[0](x_class)
+        seg_class = self.fc[0](x_class).argmax(1)
 
         
 
@@ -513,9 +496,7 @@ class Multitask_cutoff_UNet(SegmentationNetwork):
         """
         if not isinstance(num_pool_per_axis, np.ndarray):
             num_pool_per_axis = np.array(num_pool_per_axis)
-        print("bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb")   # donnt run
-        print("bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb")
-        print("bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb")
+
 
         npool = len(pool_op_kernel_sizes)
 
