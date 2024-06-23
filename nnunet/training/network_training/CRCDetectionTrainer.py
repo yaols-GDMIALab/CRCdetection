@@ -471,16 +471,8 @@ class CRCDetectionTrainer(nnUNetTrainer):
 
 
 
-    # Training
+
     def cls_inference_apply_nonlin(self, x):
         seg_prob = x[0]
         seg_prob = seg_prob.softmax(1)
-        cls_pred = x[1].argmax()
-        return torch.cat([seg_prob,  cls_pred], dim=1)
-
-
-    ## Testing  best
-    # def cls_inference_apply_nonlin(self, x):
-    #     seg_prob = x[0]
-    #     seg_prob = seg_prob.softmax(1)
-    #     return seg_prob
+        return seg_prob
