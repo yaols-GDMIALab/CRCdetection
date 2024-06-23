@@ -469,9 +469,6 @@ class CRCDetectionTrainer(nnUNetTrainer):
         return ret
 
 
-
-
-
     def cls_inference_apply_nonlin(self, x):
         seg_prob = x[0]
         seg_prob = seg_prob.softmax(1)
